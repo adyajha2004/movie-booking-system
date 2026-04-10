@@ -111,6 +111,12 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route('/book', methods=['GET', 'POST'])
+@login_required
+def book():
+    # write code for Booking a movie ticket here
+    return render_template('book.html', showtimes=showtimes)
+
 
 @app.route('/booking_list')
 @login_required
@@ -120,12 +126,6 @@ def booking_list():
         return redirect(url_for('home'))
     bookings = Booking.query.all()
     return render_template('booking_list.html', bookings=bookings)
-
-@app.route('/my_bookings')
-@login_required
-def my_bookings():
-    bookings = Booking.query.filter_by(user_id=current_user.id).all()
-    return render_template('my_bookings.html', bookings=bookings)
 
 @app.route('/movies')
 def movies():
@@ -169,6 +169,39 @@ def view_movie(movie_id):
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
     return render_template('movie_detail.html', movie=movie)
+
+@app.route('/my_bookings', methods=['GET', 'POST'])
+def my_bookings():
+    current_user_id = current_user.id
+    # get all the bookings of the current user
+    bookings = Booking.query.filter_by(user_id=current_user_id).all()
+
+    # getting all the showtimes of the movies that the user has booked
+    showtimes = []
+    for booking in bookings:
+        showtime = Showtime.query.get(booking.showtime_id)
+        showtimes.append(showtime)
+
+    now_showing = []
+    grouped = defaultdict(list)
+    now = datetime.now()
+
+    for st in showtimes:
+        movie = Movie.query.get(st.movie_id)
+        end_time = st.show_time + timedelta(minutes=movie.duration_min)
+
+        date_key = st.show_time.date()
+        grouped[date_key].append((st, movie))
+
+        # 🎬 NOW SHOWING
+        if st.show_time <= now <= end_time:
+            now_showing.append((st, movie, end_time))
+
+    return render_template(
+        'my_bookings.html',
+        grouped=grouped,
+        now_showing=now_showing
+    )
 
 @app.route('/showtimes')
 def showtimes():

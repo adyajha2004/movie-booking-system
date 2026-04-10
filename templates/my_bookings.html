@@ -5,8 +5,8 @@
 <!-- Hero Section -->
     <div class = "bg-showtime" style="margin-top: -75px; height: 70vh;">
         <div class="para-home" style = "width: 80vw;">
-            <h1 style="max-width: 700px; margin-bottom: 0px;">SHOWTIMES</h1>
-            <p style="width: 40%; line-height: 1.2; padding-left: 10px;"> This page contain details about the showtimes avaiable in a cinema</p>
+            <h1 style="max-width: 700px; margin-bottom: 0px;">YOUR BOOKINGS</h1>
+            <p style="width: 40%; line-height: 1.2; padding-left: 10px;"> This page contain details about your upcoming movie bookings</p>
     </div>
     </div>
 
@@ -14,7 +14,6 @@
 <div class="container" >
 <div class="d-flex justify-content-between mb-4 mt-4">
     <h2 class="text-white">All show</h2>
-    <a href="{{ url_for('add_showtime') }}" class="btn mybutton btn-danger">+ Add</a>
 </div>
 
 <!-- 🎬 NOW SHOWING -->
@@ -30,7 +29,7 @@
         {% endfor %}
     </div>
 {% else %}
-    <p class="text-muted">No movies currently running</p>
+    <p class="text-muted">No movies Booked for now</p>
 {% endif %}
 </div>
 
