@@ -1,14 +1,13 @@
 {% extends "0base.html" %}
 
-{% block title %}Screens{% endblock %}
-
 {% block content %}
 
+<div class="container" style="margin-left: 20px; margin-right: 20px;">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="text-white">Screens</h2>
 
     {% if current_user.is_authenticated and current_user.is_admin %}
-    <a href="{{ url_for('add_screen') }}" class="btn btn-danger">+ Add Screen</a>
+    <a href="{{ url_for('add_screen') }}" class="btn mybutton btn-danger">+ Add Screen</a>
     {% endif %}
 </div>
 
@@ -41,6 +40,7 @@
 {% if screens|length == 0 %}
 <div class="text-center mt-5">
     <p class="text-muted">No screens added yet</p>
+</div>
 </div>
 {% endif %}
 

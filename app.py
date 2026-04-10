@@ -182,24 +182,37 @@ def add_showtime():
         show_time_str = request.form.get('show_time')
 
         show_time = datetime.strptime(show_time_str, "%Y-%m-%dT%H:%M")
-
+        
         movie = Movie.query.get(movie_id)
-        duration = timedelta(minutes=movie.duration_min)
-
+        
+        # 1. Add a 20-minute buffer for theater cleaning
+        cleaning_buffer = timedelta(minutes=20)
+        
         new_start = show_time
-        new_end = show_time + duration
+        # The screen is "occupied" until the movie ends AND the cleaning is done
+        new_end = show_time + timedelta(minutes=movie.duration_min) + cleaning_buffer
 
-        # 🚨 CONFLICT CHECK
-        existing_showtimes = Showtime.query.filter_by(screen_id=screen_id).all()
+        # 2. Optimization: Only fetch showtimes for this specific day
+        start_of_day = show_time.replace(hour=0, minute=0, second=0)
+        end_of_day = start_of_day + timedelta(days=1)
 
+        existing_showtimes = Showtime.query.filter(
+            Showtime.screen_id == screen_id,
+            Showtime.show_time >= start_of_day,
+            Showtime.show_time < end_of_day
+        ).all()
+
+        # 3. CONFLICT CHECK
         for st in existing_showtimes:
-            existing_movie = Movie.query.get(st.movie_id)
-            existing_end = st.show_time + timedelta(minutes=existing_movie.duration_min)
+            # Look how clean this is! We use the relationship (st.movie) instead of making a new query
+            existing_end = st.show_time + timedelta(minutes=st.movie.duration_min) + cleaning_buffer
 
             if (st.show_time < new_end) and (existing_end > new_start):
-                flash("Time conflict with another movie!", "danger")
+                # Pro-tip: Include the conflicting movie name in the error message for better UX
+                flash(f"Time conflict! {st.movie.title} is occupying this screen until {existing_end.strftime('%H:%M')}.", "danger")
                 return redirect(url_for('add_showtime'))
 
+        # If it passes the loop, save it!
         showtime = Showtime(
             movie_id=movie_id,
             screen_id=screen_id,
@@ -212,8 +225,27 @@ def add_showtime():
 
         flash("Showtime added!", "success")
         return redirect(url_for('showtimes'))
+    
+    # movie shown right now
+    now = datetime.now()
+    
+    # (Otherwise you will load years of history into memory!)
+    four_hours_ago = now - timedelta(hours=4)
+    
+    recent_shows = Showtime.query.filter(
+        Showtime.show_time <= now,
+        Showtime.show_time >= four_hours_ago
+    ).all()
 
-    return render_template('add_showtime.html', movies=movies, screens=screens)
+    current_showtimes = []
+    
+    for st in recent_shows:
+        movie_end_time = st.show_time + timedelta(minutes=st.movie.duration_min)
+        
+        if movie_end_time >= now:
+            current_showtimes.append(st)
+
+    return render_template('add_showtime.html', movies=movies, screens=screens, current_showtimes=current_showtimes)
 
 @app.route('/screens')
 def screens():
@@ -235,7 +267,7 @@ def add_screen():
         db.session.add(screen)
         db.session.commit()
 
-        # 🎯 AUTO GENERATE SEATS
+        # AUTO GENERATE SEATS
         row_list = rows.split(',')
 
         for row in row_list:
@@ -251,7 +283,6 @@ def add_screen():
 
         flash("Screen + Seats created!", "success")
         return redirect(url_for('screens'))
-
     return render_template('add_screen.html')
 
 if __name__ == '__main__':
