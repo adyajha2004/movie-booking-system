@@ -1,0 +1,40 @@
+{% extends '0base.html' %}
+
+{% block content %}
+<div class="flex-row" style="    align-content: center; justify-content: center; padding: 40px;">
+<div class="flex-column gap-16p" style="width: 40%; min-width: 272px; padding: 40px; border: 1px solid #ccc; border-radius: 40px;">
+    <h2 style="text-align: center;">Register</h2>
+    <form method="POST" class="form flex-column gap-20p">
+        {{ form.hidden_tag() }}
+        <div class="flex-column gap-8p">
+            <div>
+                {% if form.username.errors %}
+                    <div class="alert alert-danger">{{ form.username.errors[0] }}</div>
+                {% endif %}
+                {{ form.username(class="form-control", placeholder="username") }}
+            </div>
+            <div>
+                {% if form.name.errors %}
+                <div class="alert alert-danger">{{ form.name.errors[0] }}</div>
+                {% endif %}
+                {{ form.name(class="form-control", placeholder="Full Name") }}
+            </div>
+            <div>
+                {% if form.password.errors %}
+                    <div class="alert alert-danger">{{ form.password.errors[0] }}</div>
+                {% endif %}
+                {{ form.password(class="form-control", placeholder="Password") }}
+            </div>
+            <div>
+            {% if form.confirm_password.errors %}
+                <div class="alert alert-danger">{{ form.confirm_password.errors[0] }}</div>
+            {% endif %}
+            {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+        </div>
+        <div class="flex-column gap-8p" style="justify-content: center; align-items: center;">
+            <button type="submit" class="btn btn-primary">Log In</button>
+            <a href="{{ url_for('login') }}" style="text-align: center; display: block; color: #F33942; text-decoration: none;">already have an account?</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
