@@ -1,28 +1,38 @@
 {% extends "0base.html" %}
 
-{% block title %}Movies{% endblock %}
-
 {% block content %}
+<div class="container" style="margin-left: 20px; margin-right: 20px;">
 <div class="d-flex justify-content-between mb-3">
     <h2>Movies</h2>
+    {% if current_user.is_authenticated and current_user.is_admin %}
     <a href="{{ url_for('add_movie') }}" class="btn btn-danger">+ Add</a>
+    {% endif %}
 </div>
 
 <div class="row">
 {% for movie in movies %}
-<div class="col-md-3 mb-4">
-    <div class="card bg-dark text-white">
+<div class="col-md-3 mb-4 d-flex">
 
-        <img src="{{ movie.poster_url }}" class="card-img-top" style="height:250px; object-fit:cover;">
+    <!-- Movie Card -->
+    <div class="card w-100 h-100 bg-dark text-white">
 
-        <div class="card-body">
+        <img src="{{ movie.poster_url }}" class="card-img-top  w-100" style="height:250px; object-fit:cover;">
+
+        <div class="card-body flex-column  w-100 h-100" style="align-items: flex-start; justify-content: space-between;">
+            <div>
             <h5>{{ movie.title }}</h5>
-            <p>{{ movie.genre }}</p>
-            <p>{{ movie.duration_min }} min</p>
-        </div>
-
+            <div class="d-flex flex-column gap-1 mt-2 mb-3" style="align-items: flex-start;">
+            <p style="margin-bottom: 0;">{{ movie.genre }}</p>
+            <p style="margin-bottom: 0;">{{ movie.duration_min }} min</p>
+            </div>
+            </div>
+            {% if current_user.is_authenticated and not current_user.is_admin %}
+                <a href="{{ url_for('view_movie', movie_id=movie.id) }}" class="mybutton btn btn-primary" style="margin-bottom: 10px;">View More</a>
+            {% endif %}
+            </div>
     </div>
 </div>
 {% endfor %}
+</div>
 </div>
 {% endblock %}

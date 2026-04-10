@@ -1,47 +1,62 @@
 {% extends "0base.html" %}
 
-{% block title %}Showtimes{% endblock %}
-
 {% block content %}
 
-<div class="d-flex justify-content-between mb-3">
-    <h2>Showtimes</h2>
+<div class="d-flex justify-content-between mb-4">
+    <h2 class="text-danger">Showtimes</h2>
     <a href="{{ url_for('add_showtime') }}" class="btn btn-danger">+ Add</a>
 </div>
 
-<!-- 🔥 NOW SHOWING -->
-<h3 class="text-danger">Now Showing</h3>
+<!-- 🎬 NOW SHOWING -->
+<h3 class="text-danger mb-2">Now Showing</h3>
 
-{% for st, movie, end in now_showing %}
-<div class="mb-2">
-    🎬 {{ movie.title }} | {{ st.screen.name }} | Ends at {{ end.strftime('%H:%M') }}
-</div>
+{% if now_showing %}
+    <div class="mb-4">
+        {% for st, movie, end in now_showing %}
+        <div class="p-2 border-bottom">
+            🎬 {{ movie.title }} | Screen {{ st.screen.name }} | Ends at {{ end.strftime('%H:%M') }}
+        </div>
+        {% endfor %}
+    </div>
 {% else %}
-<p>No movies currently running</p>
-{% endfor %}
+    <p class="text-muted">No movies currently running</p>
+{% endif %}
 
-<hr>
+<hr class="mb-4">
 
-<!-- 📅 GROUPED -->
+<!-- 📅 SHOWTIMES -->
 {% for date, items in grouped.items() %}
-<h4 class="mt-4">{{ date }}</h4>
 
-<table class="table table-dark table-striped">
-<tr>
-    <th>Movie</th>
-    <th>Time</th>
-    <th>Screen</th>
-</tr>
+<div class="mb-5">
 
-{% for st, movie in items %}
-<tr>
-    <td>{{ movie.title }}</td>
-    <td>{{ st.show_time.strftime('%H:%M') }}</td>
-    <td>{{ st.screen.name }}</td>
-</tr>
-{% endfor %}
+    <h4 class="mb-3">{{ date }}</h4>
 
-</table>
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th style="width:50%">Movie</th>
+                    <th style="width:25%">Time</th>
+                    <th style="width:25%">Screen</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for st, movie in items %}
+                <tr>
+                    <td>{{ movie.title }}</td>
+                    <td>{{ st.show_time.strftime('%H:%M') }}</td>
+                    <td>{{ st.screen.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
 {% endfor %}
 
 {% endblock %}

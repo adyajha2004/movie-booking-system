@@ -46,7 +46,6 @@ def inject_user():
 @app.route('/')
 def home():
     if not current_user.is_authenticated:
-        flash('Please log in to access the home page.', 'info')
         return redirect(url_for('login'))
     
     return render_template('home.html')
@@ -86,7 +85,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
 
 
@@ -127,7 +125,7 @@ def add_movie():
             genre=request.form.get('genre'),
             duration_min=int(request.form.get('duration')),
             language=request.form.get('language'),
-            poster_url=request.form.get('poster')
+            poster_url=request.form.get('poster_url')
         )
 
         db.session.add(movie)
@@ -138,7 +136,11 @@ def add_movie():
 
     return render_template('add_movie.html')
 
-    
+@app.route('/view/<int:movie_id>')
+def view_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    return render_template('view_movie.html', movie=movie)
+
 @app.route('/showtimes')
 def showtimes():
     showtimes = Showtime.query.order_by(Showtime.show_time).all()
