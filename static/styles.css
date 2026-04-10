@@ -1,5 +1,6 @@
 * {
     color: #FFF;
+    font-family: 'Inter', sans-serif;
 }
 
 p {
@@ -115,8 +116,16 @@ h1, h2, h3, h4, h5, h6{
 }
 
 h1{
-    font-size: 24px !important;
-    font-weight: 700;
+    font-family: "Epilogue", sans-serif;
+    font-size: 76px !important;
+    font-style: normal !important;
+    font-weight: 900 !important;
+    line-height: 4rem !important; /* 100% */
+    letter-spacing: -0.02em !important;}
+
+.bg-darker{
+    background: rgba(19, 19, 19, 0.60);
+    backdrop-filter: blur(10px);
 }
 
 /* nav bar colour change */
@@ -163,6 +172,26 @@ form .form-control{
 form input:focus, form select:focus, form textarea:focus{
     background-color: #F7F7F7 !important;
     background-image: none !important;
+}
+
+.hero-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: 
+            linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0)),
+            url('/static/images/bg.jpg') center/cover no-repeat;
+}
+
+.para-home{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    height: 80vh;
+    margin: 40px;
 }
 
 .profile-container{

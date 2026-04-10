@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Add Showtime{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+
+<form method="POST" style="width:400px; background:#1e1e1e; padding:30px; border-radius:20px;">
+    
+    <h3>Add Showtime ⏰</h3>
+
+    <!-- MOVIE -->
+    <select name="movie_id" class="form-control mb-3" required>
+        <option value="">Select Movie</option>
+        {% for m in movies %}
+        <option value="{{ m.id }}">{{ m.title }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- SCREEN -->
+    <select name="screen_id" class="form-control mb-3" required>
+        <option value="">Select Screen</option>
+        {% for s in screens %}
+        <option value="{{ s.id }}">{{ s.name }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- TIME -->
+    <input type="datetime-local" name="show_time" class="form-control mb-3" required>
+
+    <!-- PRICE -->
+    <input type="number" step="0.01" name="price" placeholder="Price" class="form-control mb-3" required>
+
+    <button class="btn btn-danger w-100">Add Showtime</button>
+
+</form>
+
+</div>
+{% endblock %}

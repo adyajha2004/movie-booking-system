@@ -18,7 +18,7 @@
 </head>
 <body style="background-color: #131313;">
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-darker fixed-top">
             <div class="container-fluid">
                 <div class="normal-a d-flex flex-row align-items-center gap-36p w-100">
                     <div class="normal-a d-flex flex-row align-items-center gap-20p">
@@ -27,6 +27,8 @@
                     <a class="nav-link-custom {% if request.endpoint == 'movies' %}active{% endif %}" href="{{ url_for('movies') }}">Movies</a>
                     {% if current_user.is_authenticated and current_user.is_admin %}
                     <a class="nav-link-custom {% if request.endpoint == 'booking_list' %}active{% endif %}" href="{{ url_for('booking_list') }}">Booking list</a>
+                    <a class="nav-link-custom {% if request.endpoint == 'add_movie' %}active{% endif %}" href="{{ url_for('add_movie') }}">Add Movie</a>
+                    <a class="nav-link-custom {% if request.endpoint == 'add_showtime' %}active{% endif %}" href="{{ url_for('add_showtime') }}">Add Showtime</a>
                     {% else %}
                     <a class="nav-link-custom {% if request.endpoint == 'my_bookings' %}active{% endif %}" href="{{ url_for('my_bookings') }}">My Bookings</a>
                     {% endif %}
@@ -46,7 +48,7 @@
             </div>
         </nav>
     </header>
-    <main class="container centered-content mt-5" style="padding-top: 30px; padding-bottom: 30px;">
+    <main class="container centered-content mt-5" style="padding-top: 30px; padding-bottom: 30px; padding-left: 0px ; padding-right: 0px; max-width: 100%;">
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}

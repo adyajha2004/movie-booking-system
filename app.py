@@ -1,4 +1,6 @@
 # backend for the movie booking system
+from collections import defaultdict
+
 from flask import Flask, render_template, flash, redirect, session, url_for, request
 from flask_migrate import migrate
 from flask_wtf import CSRFProtect, FlaskForm
@@ -10,7 +12,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from extension import db, login_manager
 from form import LoginForm, RegistrationForm
-from models import User, Movie, Showtime, Seat, Booking, Review, BookingSeat
+from models import Screen, User, Movie, Showtime, Seat, Booking, Review, BookingSeat
 
 
 secret_key = 'aksaslknmckjdnoaekmdaksmc'  # Replace with a secure key in production
@@ -47,8 +49,7 @@ def home():
         flash('Please log in to access the home page.', 'info')
         return redirect(url_for('login'))
     
-    movies = Movie.query.all()
-    return render_template('home.html', movies=movies)
+    return render_template('home.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -108,6 +109,147 @@ def my_bookings():
     bookings = Booking.query.filter_by(user_id=current_user.id).all()
     return render_template('my_bookings.html', bookings=bookings)
 
+@app.route('/movies')
+def movies():
+    now = datetime.now()
+
+    movies = Movie.query.join(Showtime).filter(
+        Showtime.show_time >= now
+    ).distinct().all()
+
+    return render_template('movies.html', movies=movies)
+
+@app.route('/add-movie', methods=['GET', 'POST'])
+@login_required
+def add_movie():
+    if not current_user.is_admin:
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        movie = Movie(
+            title=request.form.get('title'),
+            genre=request.form.get('genre'),
+            duration_min=int(request.form.get('duration')),
+            language=request.form.get('language'),
+            poster_url=request.form.get('poster')
+        )
+
+        db.session.add(movie)
+        db.session.commit()
+
+        flash("Movie added!", "success")
+        return redirect(url_for('movies'))
+
+    return render_template('add_movie.html')
+
+    
+@app.route('/showtimes')
+def showtimes():
+    showtimes = Showtime.query.order_by(Showtime.show_time).all()
+
+    grouped = defaultdict(list)
+    now_showing = []
+
+    now = datetime.now()
+
+    for st in showtimes:
+        movie = Movie.query.get(st.movie_id)
+        end_time = st.show_time + timedelta(minutes=movie.duration_min)
+
+        date_key = st.show_time.date()
+        grouped[date_key].append((st, movie))
+
+        # 🎬 NOW SHOWING
+        if st.show_time <= now <= end_time:
+            now_showing.append((st, movie, end_time))
+
+    return render_template(
+        'showtimes.html',
+        grouped=grouped,
+        now_showing=now_showing
+    )
+
+@app.route('/add-showtime', methods=['GET', 'POST'])
+@login_required
+def add_showtime():
+    if not current_user.is_admin:
+        return redirect(url_for('home'))
+
+    movies = Movie.query.all()
+    screens = Screen.query.all()
+
+    if request.method == 'POST':
+        movie_id = int(request.form.get('movie_id'))
+        screen_id = int(request.form.get('screen_id'))
+        show_time_str = request.form.get('show_time')
+
+        show_time = datetime.strptime(show_time_str, "%Y-%m-%dT%H:%M")
+
+        movie = Movie.query.get(movie_id)
+        duration = timedelta(minutes=movie.duration_min)
+
+        new_start = show_time
+        new_end = show_time + duration
+
+        # 🚨 CONFLICT CHECK
+        existing_showtimes = Showtime.query.filter_by(screen_id=screen_id).all()
+
+        for st in existing_showtimes:
+            existing_movie = Movie.query.get(st.movie_id)
+            existing_end = st.show_time + timedelta(minutes=existing_movie.duration_min)
+
+            if (st.show_time < new_end) and (existing_end > new_start):
+                flash("Time conflict with another movie!", "danger")
+                return redirect(url_for('add_showtime'))
+
+        showtime = Showtime(
+            movie_id=movie_id,
+            screen_id=screen_id,
+            show_time=show_time,
+            price=float(request.form.get('price'))
+        )
+
+        db.session.add(showtime)
+        db.session.commit()
+
+        flash("Showtime added!", "success")
+        return redirect(url_for('showtimes'))
+
+    return render_template('add_showtime.html', movies=movies, screens=screens)
+
+@app.route('/add-screen', methods=['GET', 'POST'])
+@login_required
+def add_screen():
+    if not current_user.is_admin:
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        rows = request.form.get('rows')   # e.g. A,B,C,D
+        seats_per_row = int(request.form.get('seats'))
+
+        screen = Screen(name=name)
+        db.session.add(screen)
+        db.session.commit()
+
+        # 🎯 AUTO GENERATE SEATS
+        row_list = rows.split(',')
+
+        for row in row_list:
+            for num in range(1, seats_per_row + 1):
+                seat = Seat(
+                    screen_id=screen.id,
+                    row=row.strip(),
+                    number=num
+                )
+                db.session.add(seat)
+
+        db.session.commit()
+
+        flash("Screen + Seats created!", "success")
+        return redirect(url_for('screens'))
+
+    return render_template('add_screen.html')
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Screens{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2>Screens</h2>
+    <a href="{{ url_for('add_screen') }}" class="btn btn-danger">+ Add</a>
+</div>
+
+<div class="row">
+{% for s in screens %}
+<div class="col-md-3 mb-4">
+    <div class="card bg-dark text-white p-3">
+        <h4>{{ s.name }}</h4>
+        <p>{{ s.seats|length }} seats</p>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

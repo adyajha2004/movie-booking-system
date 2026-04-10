@@ -1,0 +1,23 @@
+{%- extends '0base.html' -%}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    
+    <form method="POST" style="width: 400px; background: #1e1e1e; padding: 30px; border-radius: 20px;">
+        <h2 style="color: white; margin-bottom: 20px;">Add Movie 🎬</h2>
+
+        <input type="text" name="title" placeholder="Title" class="form-control mb-3" required>
+
+        <input type="text" name="genre" placeholder="Genre" class="form-control mb-3">
+
+        <input type="number" name="duration" placeholder="Duration (min)" class="form-control mb-3">
+
+        <input type="text" name="language" placeholder="Language" class="form-control mb-3">
+
+        <input type="text" name="poster_url" placeholder="Poster Image URL" class="form-control mb-3">
+
+        <button type="submit" class="btn btn-danger w-100">Add Movie</button>
+    </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "0base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+
+<form method="POST" style="width:400px; background:#1e1e1e; padding:30px; border-radius:20px;">
+    
+    <h3>Add Screen 🏢</h3>
+
+    <input name="name" placeholder="Screen Name (Screen 1)" class="form-control mb-3" required>
+
+    <input name="rows" placeholder="Rows (A,B,C,D)" class="form-control mb-3" required>
+
+    <input name="seats" type="number" placeholder="Seats per row" class="form-control mb-3" required>
+
+    <button class="btn btn-danger w-100">Create Screen</button>
+
+</form>
+
+</div>
+{% endblock %}
