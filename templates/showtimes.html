@@ -2,14 +2,24 @@
 
 {% block content %}
 
-<div class="container" style="margin-left: 20px; margin-right: 20px;">
-<div class="d-flex justify-content-between mb-4">
-    <h2 class="text-danger">Showtimes</h2>
+<!-- Hero Section -->
+    <div class = "bg-showtime" style="margin-top: -75px; height: 70vh;">
+        <div class="para-home" style = "width: 80vw;">
+            <h1 style="max-width: 700px; margin-bottom: 0px;">SHOWTIMES</h1>
+            <p style="width: 40%; line-height: 1.2; padding-left: 10px;"> This page contain details about the showtimes avaiable in a cinema</p>
+    </div>
+    </div>
+
+<!-- Content -->
+<div class="container" >
+<div class="d-flex justify-content-between mb-4 mt-4">
+    <h2 class="text-white">All show</h2>
     <a href="{{ url_for('add_showtime') }}" class="btn mybutton btn-danger">+ Add</a>
 </div>
 
 <!-- 🎬 NOW SHOWING -->
-<h3 class="text-danger mb-2">Now Showing</h3>
+<div style="border: 1px solid #ccc; border-radius: 40px; padding: 20px; padding-top: 40px;">
+<h4 class="text-danger mb-2">Now Showing</h3>
 
 {% if now_showing %}
     <div class="mb-4">
@@ -22,24 +32,25 @@
 {% else %}
     <p class="text-muted">No movies currently running</p>
 {% endif %}
+</div>
 
-<hr class="mb-4">
+<hr class="mb-4" style="margin-top: 40px;">
 
 <!-- 📅 SHOWTIMES -->
 {% for date, items in grouped.items() %}
 
 <div class="mb-5">
 
-    <h4 class="mb-3">{{ date }}</h4>
+    <h4 class="mb-3">{{ date | date_suffix }}</h4>
 
-    <div class="table-responsive">
+    <div class="table-responsive" style="border-radius: 20px; ">
         <table class="table table-dark table-hover align-middle mb-0">
 
             <thead>
                 <tr>
-                    <th style="width:50%">Movie</th>
-                    <th style="width:25%">Time</th>
-                    <th style="width:25%">Screen</th>
+                    <th style="width:50%; color: white; background-color: #353534;">Movie</th>
+                    <th style="width:25%; color: white; background-color: #353534;">Time</th>
+                    <th style="width:25%; color: white; background-color: #353534;">Screen</th>
                 </tr>
             </thead>
 

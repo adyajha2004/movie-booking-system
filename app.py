@@ -41,6 +41,26 @@ def inject_user():
     return dict(current_user = current_user, request = request)
 
 
+# functions
+def format_date_with_suffix(value):
+    if isinstance(value, str):
+        try:
+            date_obj = datetime.strptime(value, '%Y-%m-%d')
+        except ValueError:
+            return value 
+    else:
+        date_obj = value
+
+    day = date_obj.day
+    if 11 <= day <= 13:
+        suffix = 'th'
+    else:
+        suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
+
+    return f"{day}{suffix} {date_obj.strftime('%B %Y')}"
+
+app.jinja_env.filters['date_suffix'] = format_date_with_suffix
+
 # routes
 
 @app.route('/')
@@ -75,7 +95,6 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            flash('Logged in successfully!', 'success')
             return redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
