@@ -3,7 +3,10 @@
 {% block content %}
 
 <!-- Hero Section -->
-    <div class = "hero-page" style="margin-top: -75px; height: 70vh;">
+    <div class = "hero-page" style="margin-top: -75px; height: 70vh;
+            background: 
+            linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)),
+            url('/static/images/bg1.png') center/cover no-repeat;">
         <div class="para-home" style = "width: 80vw;">
             <h1 style="max-width: 700px; margin-bottom: 0px;">SCREENS</h1>
             <p style="width: 40%; line-height: 1.2; padding-left: 10px;"> This page contain details about the screens avaiable in a cinema hall</p>
@@ -29,7 +32,7 @@
 
         <div class="card-body w-100 h-100 d-flex flex-column justify-content-between" style="align-items: flex-start; margin: 20px">
 
-            <div>
+            <div style="width: 80%;">
                 <h4 class="card-title">{{ screen.name }}</h4>
                 <p style="margin-bottom: 2px;">{{ screen.seats|length }} seats</p>
                 <p>

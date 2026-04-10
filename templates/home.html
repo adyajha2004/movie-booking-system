@@ -2,13 +2,12 @@
 {%- block content -%}
 
 <!-- Hero Section -->
-    <div class = "hero-page" style="margin-top: -75px;">
+    <div class = "hero-page mb-4" style="margin-top: -75px;">
         <div class="para-home">
-            <h1 style="max-width: 700px; margin-bottom: 0px;">THE MIDNIGHT
+            <h1 style="max-width: 700px; margin-bottom: 0px;">THE CRAZE OF  
 CINEMA</h1>
             <p style="width: 40%; line-height: 1.2; padding-left: 10px;"> In a city that never sleeps, one theater holds the keys
-            to a reality beyond imagination. A visual masterpiece
-            by director Julian Vance.</p>
+            to a reality beyond imagination. A visual masterpiece</p>
         <div class="d-flex flex-column gap-20p">
             <a href="{{ url_for('movies') }}" class="mybutton btn btn-primary btn-lg" style="width: 200px; font-size: 18px;">Explore Movies</a>
         </div>
@@ -17,29 +16,42 @@ CINEMA</h1>
 
 <!-- movie section -->
 
-    <!-- genre that directs to movie list with genre filter -->
-    <div class="genre-section">
-        <h2 style="margin-bottom: 20px;">Genres</h2>
-        <div class="d-flex flex-row gap-20p">
-            {% for genre in genre_list %}
-            <a href="{{ url_for('movies', genre=genre) }}" class="btn btn-outline-primary">{{ genre }}</a>
-            {% endfor %}
+<!-- Movie cards -->
+    
+    <div class="container">
+        <div class="d-flex justify-content-between mb-3">
+            <h2>Movies</h2>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <a href="{{ url_for('add_movie') }}" class="btn mybutton btn-danger">+ Add</a>
+            {% endif %}
+        </div>
+
+        <div class="row">
+        {% for movie in now_showing_movies %}
+        <div class="col-md-3 mb-4 d-flex">
+
+            <!-- Movie Card -->
+            <div class="card w-100 h-100 bg-dark text-white">
+
+                <img src="{{ movie.poster_url }}" class="card-img-top  w-100" style="height:250px; object-fit:cover;">
+
+                <div class="card-body flex-column  w-100 h-100" style="align-items: flex-start; justify-content: space-between;">
+                    <div>
+                    <h5>{{ movie.title }}</h5>
+                    <div class="d-flex flex-column gap-1 mt-2 mb-3" style="align-items: flex-start;">
+                    <p style="margin-bottom: 0;">{{ movie.genre }}</p>
+                    <p style="margin-bottom: 0;">{{ movie.duration_min }} min</p>
+                    </div>
+                    </div>
+                    {% if current_user.is_authenticated and not current_user.is_admin %}
+                        <a href="{{ url_for('view_movie', movie_id=movie.id) }}" class="mybutton btn btn-primary" style="margin-bottom: 10px;">View More</a>
+                    {% endif %}
+                    </div>
+            </div>
+        </div>
+        {% endfor %}
         </div>
     </div>
-
-    <!-- now showing -->
-    <div class="movie-section">
-        <h2 style="margin-bottom: 20px;">Now Showing</h2>
-        <div class="d-flex flex-row gap-20p overflow-auto">
-            {% for movie in now_showing_movies %}
-            <div class="movie-card" style="min-width: 200px;">
-                <a href="{{ url_for('movie_detail', movie_id=movie.id) }}">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" class="movie-poster">
-                </a>
-                <h5 class="movie-title">{{ movie.title }}</h5>
-            </div>
-            {% endfor %}
-        </div>
 
     <!-- coming soon -->
 

@@ -1,0 +1,97 @@
+{% extends "0base.html" %}
+
+{% block title %}Movie Detail{% endblock %}
+
+{% block content %}
+
+<!-- 🎬 HERO SECTION -->
+<div class="hero-section mb-5">
+
+    <div class="hero-bg"></div>
+
+    <div class="hero-content d-flex align-items-center">
+
+        <!-- Poster -->
+        <img src="{{ movie.poster_url }}" class="poster">
+
+        <!-- Info -->
+        <div class="ms-4">
+            <span class="badge bg-danger mb-2">NOW PLAYING</span>
+            <h1 class="movie-title">{{ movie.title }}</h1>
+            <p class="text-muted">
+                {{ movie.genre }} • {{ movie.duration_min }} min
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<div class="row">
+
+<!-- LEFT SIDE -->
+<div class="col-lg-8">
+
+    <!-- 📅 DATE SELECT -->
+    <div class="d-flex gap-2 mb-4">
+        {% for date in dates %}
+        <div class="date-box {% if loop.first %}active{% endif %}">
+            <small>{{ date.strftime('%b') }}</small><br>
+            <strong>{{ date.day }}</strong>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 🎥 CINEMAS -->
+    {% for cinema in cinemas %}
+    <div class="cinema-card mb-4 p-4">
+
+        <div class="d-flex justify-content-between">
+            <div>
+                <h5>{{ cinema.name }}</h5>
+                <small class="text-muted">{{ cinema.location }}</small>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- SHOWTIMES -->
+        <div class="d-flex flex-wrap gap-2 mt-2">
+            {% for show in cinema.showtimes %}
+            <a href="#" class="time-btn">
+                {{ show.show_time.strftime('%I:%M %p') }}
+            </a>
+            {% endfor %}
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+<!-- RIGHT SIDE -->
+<div class="col-lg-4">
+
+    <!-- FILTER BOX -->
+    <div class="filter-box p-4 mb-4">
+
+        <h6 class="text-danger mb-3">QUICK FILTERS</h6>
+
+        <div class="mb-3">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">IMAX</button>
+            <button class="filter-btn">3D</button>
+            <button class="filter-btn">2D</button>
+        </div>
+
+        <div>
+            <label><input type="checkbox"> Recliner Seats</label><br>
+            <label><input type="checkbox"> Dining-in</label>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

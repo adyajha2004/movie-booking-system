@@ -68,7 +68,12 @@ def home():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
     
-    return render_template('home.html')
+    # showing only movies that are currently showing today
+    now = datetime.now()
+    now_showing_movies = Movie.query.join(Showtime).filter(
+        Showtime.show_time <= now
+    ).distinct().all()
+    return render_template('home.html', now_showing_movies=now_showing_movies)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -159,6 +164,11 @@ def add_movie():
 def view_movie(movie_id):
     movie = Movie.query.get_or_404(movie_id)
     return render_template('view_movie.html', movie=movie)
+
+@app.route('/movie-detail/<int:movie_id>', methods=['POST'])
+def movie_detail(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    return render_template('movie_detail.html', movie=movie)
 
 @app.route('/showtimes')
 def showtimes():
@@ -283,6 +293,9 @@ def add_screen():
         seats_per_row = int(request.form.get('seats'))
 
         screen = Screen(name=name)
+        if Screen.query.filter_by(name=name).first():
+            flash('Screen name already exists. Please choose a different one.', 'danger')
+            return redirect(url_for('add_screen'))
         db.session.add(screen)
         db.session.commit()
 
