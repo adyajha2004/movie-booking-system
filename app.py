@@ -89,10 +89,6 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
 
-@app.route('/movies')
-def movies():
-    movies = Movie.query.all()
-    return render_template('movies.html', movies=movies)
 
 @app.route('/booking_list')
 @login_required
@@ -117,7 +113,7 @@ def movies():
         Showtime.show_time >= now
     ).distinct().all()
 
-    return render_template('movies.html', movies=movies)
+    return render_template('movies_admin.html', movies=movies)
 
 @app.route('/add-movie', methods=['GET', 'POST'])
 @login_required
@@ -216,6 +212,11 @@ def add_showtime():
         return redirect(url_for('showtimes'))
 
     return render_template('add_showtime.html', movies=movies, screens=screens)
+
+@app.route('/screens')
+def screens():
+    screens = Screen.query.all()
+    return render_template('screens.html', screens=screens)
 
 @app.route('/add-screen', methods=['GET', 'POST'])
 @login_required
