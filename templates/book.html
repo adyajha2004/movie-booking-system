@@ -1,0 +1,215 @@
+{% extends "0base.html" %}
+
+{% block title %}Select Seats - {{ movie.title }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom Theater Seat Styling */
+    .seat {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px 8px 4px 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        user-select: none;
+    }
+
+    .seat-available {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #555;
+    }
+
+    .seat-available:hover {
+        background-color: #E50914;
+        color: white;
+        border-color: #E50914;
+        transform: scale(1.1);
+    }
+
+    .seat-selected {
+        background-color: #E50914 !important;
+        color: white !important;
+        border-color: #E50914 !important;
+        box-shadow: 0px 0px 10px rgba(229, 9, 20, 0.6);
+        transform: scale(1.1);
+    }
+
+    .seat-sold {
+        background-color: #1a1a1a;
+        color: #444;
+        border: 1px solid #222;
+        cursor: not-allowed;
+    }
+
+    /* The Curved Theater Screen */
+    .screen-container {
+        perspective: 1000px;
+        margin-bottom: 50px;
+    }
+
+    .screen-curve {
+        height: 80px;
+        background: linear-gradient(to top, rgba(229, 9, 20, 0.3), transparent);
+        border-bottom: 4px solid #E50914;
+        transform: rotateX(-45deg);
+        box-shadow: 0 20px 50px rgba(229, 9, 20, 0.2);
+        border-radius: 50%;
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    
+    <div class="flex gap-16p mb-4 border-bottom border-secondary pb-3">
+        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" style="width: 80px; border-radius: 8px; object-fit: cover;">
+        <div>
+            <h2>{{ movie.title|upper }}</h2>
+            <p class="mb-0" style="font-size: 1.1rem; color: #ccc;">
+                {{ showtime.show_time.strftime('%A, %d %b %Y') }} • 
+                <strong class="text-white">{{ showtime.show_time.strftime('%I:%M %p') }}</strong> • 
+                {{ screen.name }}
+            </p>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        
+        <div class="col-lg-8 pe-lg-5">
+            
+            <div class="screen-container text-center">
+                <p class="text-muted mb-1 text-uppercase" style="letter-spacing: 4px; font-size: 0.8rem;">Screen This Way</p>
+                <div class="screen-curve w-100"></div>
+            </div>
+
+            <div class="flex-column align-items-center gap-12p">
+                {% for row_letter, seats in seats_by_row.items() %}
+                <div class="flex gap-12p">
+                    
+                    <div class="text-muted fw-bold" style="width: 25px; text-align: right; line-height: 35px;">{{ row_letter }}</div>
+                    
+                    <div class="flex gap-8p">
+                        {% for seat in seats %}
+                            {% if seat.id in booked_seat_ids %}
+                                <div class="seat seat-sold" title="Seat {{ seat.row }}{{ seat.number }} (Sold)">
+                                    {{ seat.number }}
+                                </div>
+                            {% else %}
+                                <div class="seat seat-available interactable-seat" data-seat-id="{{ seat.id }}" data-seat-name="{{ seat.row }}{{ seat.number }}" title="Seat {{ seat.row }}{{ seat.number }}">
+                                    {{ seat.number }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-muted fw-bold" style="width: 25px; line-height: 35px;">{{ row_letter }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex justify-content-center gap-36p mt-5 pt-3 border-top border-secondary">
+                <div class="flex gap-8p align-items-center"><div class="seat seat-available" style="transform: none; cursor: default;"></div> <span class="text-muted small">Available</span></div>
+                <div class="flex gap-8p align-items-center"><div class="seat seat-selected" style="transform: none; cursor: default;"></div> <span class="text-muted small">Selected</span></div>
+                <div class="flex gap-8p align-items-center"><div class="seat seat-sold" style="transform: none; cursor: default;"></div> <span class="text-muted small">Sold</span></div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 mt-5 mt-lg-0">
+            <div class="p-4 border border-secondary rounded shadow-sm bg-darker sticky-top" style="top: 20px;">
+                <h4 class="mb-4 pb-2 border-bottom border-secondary">Booking Summary</h4>
+                
+                <div class="flex mb-3">
+                    <p class="mb-0 text-muted">Ticket Price</p>
+                    <strong class="text-white">₹ <span id="ticket-price">{{ showtime.price }}</span></strong>
+                </div>
+
+                <div class="flex mb-3">
+                    <p class="mb-0 text-muted">Seats</p>
+                    <strong class="text-white text-end" id="selected-seat-names" style="max-width: 60%;">None</strong>
+                </div>
+
+                <hr class="text-secondary my-4">
+
+                <div class="flex mb-4">
+                    <h5 class="mb-0">Total Amount</h5>
+                    <h5 class="mb-0" style="color: #E50914;">₹ <span id="total-price">0.00</span></h5>
+                </div>
+
+                <form action="{{ url_for('book', showtime_id=showtime.id) }}" method="POST">
+                    
+                    <input type="hidden" id="selected-seats-input" name="selected_seats" value="">
+                    
+                    <button type="submit" id="book-btn" class="btn mybutton w-100 py-3 fs-5" disabled>
+                        Select Seats
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const interactableSeats = document.querySelectorAll('.interactable-seat');
+        const pricePerTicket = parseFloat(document.getElementById('ticket-price').innerText);
+        
+        const selectedSeatNamesEl = document.getElementById('selected-seat-names');
+        const totalPriceEl = document.getElementById('total-price');
+        const hiddenInput = document.getElementById('selected-seats-input');
+        const bookBtn = document.getElementById('book-btn');
+
+        let selectedSeats = []; // Array to hold {id, name}
+
+        interactableSeats.forEach(seat => {
+            seat.addEventListener('click', function() {
+                const seatId = this.getAttribute('data-seat-id');
+                const seatName = this.getAttribute('data-seat-name');
+
+                // Toggle logic
+                if (this.classList.contains('seat-selected')) {
+                    this.classList.remove('seat-selected');
+                    selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+                } else {
+                    this.classList.add('seat-selected');
+                    selectedSeats.push({ id: seatId, name: seatName });
+                }
+
+                updateSummary();
+            });
+        });
+
+        function updateSummary() {
+            // Update names text
+            if (selectedSeats.length > 0) {
+                selectedSeatNamesEl.innerText = selectedSeats.map(s => s.name).join(', ');
+            } else {
+                selectedSeatNamesEl.innerText = 'None';
+            }
+
+            // Update price math
+            const totalMath = (selectedSeats.length * pricePerTicket).toFixed(2);
+            totalPriceEl.innerText = totalMath;
+
+            // Update hidden input for Flask
+            hiddenInput.value = selectedSeats.map(s => s.id).join(',');
+
+            // Update button state
+            if (selectedSeats.length > 0) {
+                bookBtn.disabled = false;
+                bookBtn.innerText = `Pay ₹ ${totalMath}`;
+            } else {
+                bookBtn.disabled = true;
+                bookBtn.innerText = 'Select Seats';
+            }
+        }
+    });
+</script>
+
+{% endblock %}

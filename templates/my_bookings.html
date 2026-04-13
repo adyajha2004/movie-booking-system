@@ -18,13 +18,13 @@
 
 <!-- 🎬 NOW SHOWING -->
 <div style="border: 1px solid #ccc; border-radius: 40px; padding: 20px; padding-top: 40px;">
-<h4 class="text-danger mb-2">Now Showing</h3>
+<h4 class="text-danger mb-2">Booking for today</h3>
 
 {% if now_showing %}
     <div class="mb-4">
-        {% for st, movie, end in now_showing %}
+        {% for item in now_showing %}
         <div class="p-2 border-bottom">
-            🎬 {{ movie.title }} | Screen {{ st.screen.name }} | Ends at {{ end.strftime('%H:%M') }}
+            🎬 {{ item.movie.title }} | Screen {{ item.screen.name }} | Time: {{ item.showtime.show_time.strftime('%I:%M %p') }} | Seats: {{ item.seats }}
         </div>
         {% endfor %}
     </div>
@@ -47,18 +47,20 @@
 
             <thead>
                 <tr>
-                    <th style="width:50%; color: white; background-color: #353534;">Movie</th>
-                    <th style="width:25%; color: white; background-color: #353534;">Time</th>
-                    <th style="width:25%; color: white; background-color: #353534;">Screen</th>
+                    <th style="width:50%; color: white; background-color: #E50914;">Movie</th>
+                    <th style="width:15%; color: white; background-color: #E50914;">Time</th>
+                    <th style="width:15%; color: white; background-color: #E50914;">Screen</th>
+                    <th style="width:20%; color: white; background-color: #E50914;">Seat</th>
                 </tr>
             </thead>
 
             <tbody>
-                {% for st, movie in items %}
+                {% for item in items %}
                 <tr>
-                    <td>{{ movie.title }}</td>
-                    <td>{{ st.show_time.strftime('%H:%M') }}</td>
-                    <td>{{ st.screen.name }}</td>
+                    <td>{{ item.movie.title }}</td>
+                    <td>{{ item.showtime.show_time.strftime('%I:%M %p') }}</td>
+                    <td>{{ item.screen.name }}</td>
+                    <td>{{ item.seats }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

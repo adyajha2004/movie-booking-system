@@ -1,0 +1,67 @@
+{% extends "0base.html" %}
+
+{% block title %}Admin - All Bookings{% endblock %}
+
+{% block content %}
+
+<div class="bg-showtime" style="margin-top: -75px; height: 50vh;">
+    <div class="para-home" style="width: 80vw; justify-content: center; height: 100%;">
+        <h1 style="max-width: 700px; margin-bottom: 0px;">SYSTEM BOOKINGS</h1>
+        <p style="width: 50%; line-height: 1.2; padding-left: 10px;">Master ledger of all past, present, and future movie reservations.</p>
+    </div>
+</div>
+
+<div class="container" style="min-height: 50vh;">
+
+    {% for date, items in grouped.items() %}
+    <div class="mb-5 mt-5">
+
+        <h4 class="mb-3 text-white border-bottom border-secondary pb-2">{{ date.strftime('%A, %d %B %Y') }}</h4>
+
+        <div class="table-responsive shadow-sm" style="border-radius: 12px; border: 1px solid #444; overflow: hidden;">
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th style="width:5%; color: white; background-color: #E50914; border: none;">ID</th>
+                        <th style="width:15%; color: white; background-color: #E50914; border: none;">Customer</th>
+                        <th style="width:25%; color: white; background-color: #E50914; border: none;">Movie</th>
+                        <th style="width:10%; color: white; background-color: #E50914; border: none;">Time</th>
+                        <th style="width:10%; color: white; background-color: #E50914; border: none;">Screen</th>
+                        <th style="width:15%; color: white; background-color: #E50914; border: none;">Seats</th>
+                        <th style="width:10%; color: white; background-color: #E50914; border: none;">Revenue</th>
+                        <th style="width:10%; color: white; background-color: #E50914; border: none;">Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td class="text-muted">#{{ item.booking.id }}</td>
+                        <td class="fw-bold">{{ item.user.username }}</td>
+                        <td>{{ item.movie.title }}</td>
+                        <td>{{ item.showtime.show_time.strftime('%I:%M %p') }}</td>
+                        <td>{{ item.screen.name }}</td>
+                        <td style="color: #E9BCB6;">{{ item.seats }}</td>
+                        <td class="fw-bold">₹{{ item.booking.total_price }}</td>
+                        <td>
+                            <span class="badge {% if item.booking.status == 'confirmed' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ item.booking.status|title }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+    {% else %}
+        <div class="alert bg-darker border-secondary text-center py-5 mt-5" role="alert">
+            <h4 class="text-muted mb-0">No bookings have been made in the system yet.</h4>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

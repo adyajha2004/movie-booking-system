@@ -4,94 +4,97 @@
 
 {% block content %}
 
-<!-- 🎬 HERO SECTION -->
-<div class="hero-section mb-5">
-
-    <div class="hero-bg"></div>
-
-    <div class="hero-content d-flex align-items-center">
-
-        <!-- Poster -->
-        <img src="{{ movie.poster_url }}" class="poster">
-
-        <!-- Info -->
-        <div class="ms-4">
-            <span class="badge bg-danger mb-2">NOW PLAYING</span>
-            <h1 class="movie-title">{{ movie.title }}</h1>
-            <p class="text-muted">
-                {{ movie.genre }} • {{ movie.duration_min }} min
-            </p>
+<!-- Hero Section -->
+    <div class = "hero-page mb-4" style="margin-top: -75px; height: 80vh; background: linear-gradient(to top, #111111 0%, {{ color1 }}cc 40%, {{ color2 }}cc 100%);">
+        <div class = flex-row style="align-items: flex-end; width: 80vw;">
+            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" style="width:280px; height: 400px; border-radius:10px; object-fit:cover; ">
+            <div class="para-home mt-6">
+                <!-- capitalised title -->
+                <h1 style="max-width: 700px; margin-bottom: 0px;">{{ movie.title|upper }}</h1>
+                <p style="width: 40%; line-height: 1.2; padding-left: 10px;">{{ movie.language }}</p>
+            </div>
         </div>
-
-    </div>
-</div>
-
-<div class="row">
-
-<!-- LEFT SIDE -->
-<div class="col-lg-8">
-
-    <!-- 📅 DATE SELECT -->
-    <div class="d-flex gap-2 mb-4">
-        {% for date in dates %}
-        <div class="date-box {% if loop.first %}active{% endif %}">
-            <small>{{ date.strftime('%b') }}</small><br>
-            <strong>{{ date.day }}</strong>
-        </div>
-        {% endfor %}
     </div>
 
-    <!-- 🎥 CINEMAS -->
-    {% for cinema in cinemas %}
-    <div class="cinema-card mb-4 p-4">
+<div class="container mb-5">
+    <div class="row">
 
-        <div class="d-flex justify-content-between">
-            <div>
-                <h5>{{ cinema.name }}</h5>
-                <small class="text-muted">{{ cinema.location }}</small>
+        <div class="col-lg-8 mt-4">
+            
+            <h4 class="mb-3">Select Date & Time</h4>
+
+            <div class="flex gap-12p mb-4 overflow-auto pb-2">
+                {% for date in dates %}
+                <a href="{{ url_for('movie_detail', movie_id=movie.id, date=date.strftime('%Y-%m-%d')) }}" class="normal-a">
+                    <div class="date-box p-3 border rounded text-center shadow-sm {% if date == selected_date %}mybutton{% else %}bg-darker border-secondary{% endif %}" style="cursor: pointer; min-width: 85px; transition: 0.2s;">
+                        <small class="text-uppercase" style="font-size: 0.8rem;">{{ date.strftime('%b') }}</small><br>
+                        <strong style="font-size: 1.2rem;">{{ date.day }}</strong>
+                    </div>
+                </a>
+                {% endfor %}
+                
+                {% if not dates %}
+                    <div class="alert bg-darker border-secondary w-100" role="alert">
+                        <p class="mb-0">No upcoming showtimes available for this movie right now.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if cinemas %}
+                {% for cinema in cinemas %}
+                <div class="cinema-card mb-4 p-4 border border-secondary rounded shadow-sm bg-darker">
+                    <div class="flex mb-3">
+                        <div>
+                            <h5 class="mb-1">{{ cinema.name }}</h5>
+                            <p class="mb-0" style="font-size: 0.9rem;"><i class="bi bi-geo-alt-fill"></i> {{ cinema.location }}</p>
+                        </div>
+                    </div>
+
+                    <hr class="text-secondary">
+
+                    <div class="flex flex-wrap gap-16p mt-4">
+                        {% for show in cinema.showtimes %}
+                        <a href="{{ url_for('book', showtime_id=show.id) }}" class="btn mybutton px-4 py-2" style="border-radius: 8px; font-weight: 500;">
+                            {{ show.show_time.strftime('%I:%M %p') }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% elif dates %}
+                <div class="alert bg-darker border-secondary" role="alert">
+                    <p class="mb-0">No shows scheduled for the selected date. Please pick another date above.</p>
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="col-lg-4">
+            <div class="movie-info-card p-4 border border-secondary rounded shadow-sm bg-darker sticky-top" style="top: 20px;">
+                <h4 class="mb-3 border-bottom border-secondary pb-2">About the Movie</h4>
+                
+                <ul class="list-unstyled mt-4 mb-0">
+                    <li class="mb-3 flex">
+                        <p class="mb-0">Genre: </p>
+                        <p class="text-end">{{ movie.genre }}</p>
+                    </li>
+                    <li class="mb-3 flex">
+                        <p class="mb-0">Duration: </p>
+                        <p class="text-end">{{ movie.duration_min }} mins</p>
+                    </li>
+                    <li class="mb-3 flex">
+                        <p class="mb-0">Language: </p>
+                        <p class="text-end">{{ movie.language }}</p>
+                    </li>
+                    <li class="mb-3 flex">
+                        <p class="mb-0">Rating: </p>
+                        <p class="text-end"><i class="bi bi-star-fill text-warning"></i> {{ movie.rating | default('N/A', true) }} / 5.0</p>
+                    </li>
+                </ul>
             </div>
         </div>
 
-        <hr>
-
-        <!-- SHOWTIMES -->
-        <div class="d-flex flex-wrap gap-2 mt-2">
-            {% for show in cinema.showtimes %}
-            <a href="#" class="time-btn">
-                {{ show.show_time.strftime('%I:%M %p') }}
-            </a>
-            {% endfor %}
-        </div>
-
     </div>
-    {% endfor %}
-
-</div>
-
-<!-- RIGHT SIDE -->
-<div class="col-lg-4">
-
-    <!-- FILTER BOX -->
-    <div class="filter-box p-4 mb-4">
-
-        <h6 class="text-danger mb-3">QUICK FILTERS</h6>
-
-        <div class="mb-3">
-            <button class="filter-btn active">All</button>
-            <button class="filter-btn">IMAX</button>
-            <button class="filter-btn">3D</button>
-            <button class="filter-btn">2D</button>
-        </div>
-
-        <div>
-            <label><input type="checkbox"> Recliner Seats</label><br>
-            <label><input type="checkbox"> Dining-in</label>
-        </div>
-
-    </div>
-
-</div>
-
 </div>
 
 {% endblock %}

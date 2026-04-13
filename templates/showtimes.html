@@ -48,15 +48,17 @@
 
             <thead>
                 <tr>
-                    <th style="width:50%; color: white; background-color: #353534;">Movie</th>
-                    <th style="width:25%; color: white; background-color: #353534;">Time</th>
-                    <th style="width:25%; color: white; background-color: #353534;">Screen</th>
+                    <th style="width:10%; color: white; background-color: #E50914;">ID</th>
+                    <th style="width:30%; color: white; background-color: #E50914;">Movie</th>
+                    <th style="width:25%; color: white; background-color: #E50914;">Time</th>
+                    <th style="width:35%; color: white; background-color: #E50914;">Screen</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for st, movie in items %}
                 <tr>
+                    <td>{{ st.id }}</td>
                     <td>{{ movie.title }}</td>
                     <td>{{ st.show_time.strftime('%H:%M') }}</td>
                     <td>{{ st.screen.name }}</td>
