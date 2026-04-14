@@ -96,7 +96,6 @@ def get_color_palette(image_url):
     """
     Takes an image URL and returns the top TWO dominant Hex colors for a gradient.
     """
-    # Default fallback colors (a nice dark grey to black gradient) if no URL exists
     if not image_url:
         return '#1a1a1a', '#000000'  
 
@@ -132,7 +131,12 @@ def home():
     now_showing_movies = Movie.query.join(Showtime).filter(
         Showtime.show_time <= now
     ).distinct().all()
-    return render_template('home.html', now_showing_movies=now_showing_movies)
+
+    all_movies = Movie.query.join(Showtime).filter(
+        Showtime.show_time >= now
+    ).distinct().all()
+
+    return render_template('home.html', now_showing_movies=now_showing_movies, all_movies=all_movies)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
